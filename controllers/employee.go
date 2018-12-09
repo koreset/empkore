@@ -10,7 +10,11 @@ import (
 
 func CreateEmployee(c *gin.Context) {
 	var emp models.Employee
-	c.ShouldBind(&emp)
+	err := c.ShouldBind(&emp)
+	if err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "An unspecified error occurred with the request"})
+		return
+	}
 
 	if isValidEmployee(emp) {
 		services.CreateNewEmployee(&emp)
