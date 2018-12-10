@@ -12,7 +12,7 @@ func CreateEmployee(c *gin.Context) {
 	var emp models.Employee
 	err := c.ShouldBind(&emp)
 	if err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{"error": "An unspecified error occurred with the request"})
+		c.JSON(http.StatusBadRequest, gin.H{"error": err})
 		return
 	}
 
@@ -24,7 +24,6 @@ func CreateEmployee(c *gin.Context) {
 	}else{
 		c.JSON(http.StatusBadRequest, gin.H{"error":"There were one or more validation errors encountered"})
 	}
-
 }
 
 func isValidEmployee(emp models.Employee) bool {

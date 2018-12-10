@@ -27,6 +27,7 @@ func Login(c *gin.Context) {
 	if isValid(userLogin) {
 		if authenticateEmployee(userLogin.Email, userLogin.Password) {
 			c.JSON(http.StatusOK, gin.H{"token": "123456789"})
+			return
 		}
 	}
 	c.JSON(http.StatusUnauthorized, gin.H{"error": "Supplied credentials are invalid"})

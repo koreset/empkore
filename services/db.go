@@ -15,7 +15,7 @@ func InitializeDB() error {
 	if gin.Mode() == gin.TestMode {
 		db, err = gorm.Open("sqlite3", "../empkoretest.db")
 	} else {
-		db, err = gorm.Open("mysql", "root:wordpass15@tcp(localhost:3306)/empkoredb?charset=utf8&parseTime=True&loc=local")
+		db, err = gorm.Open("mysql", "root:wordpass15@tcp(localhost:3306)/empkoredb?charset=utf8&parseTime=True&loc=Local")
 	}
 
 	if err != nil {

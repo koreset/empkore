@@ -62,14 +62,21 @@ func TestCreateEmployeeJsonPayload(t *testing.T) {
 	//Given
 	setupDB()
 	var actual models.Employee
-	newEmp := utils.GetValidEmployee()
-	newEmpJson, _ := json.Marshal(newEmp)
+	payload := make(map[string]interface{})
+	payload["first_name"] = "Jome"
+	payload["last_name"] = "Akpoduado"
+	payload["email"] = "jome@koreset.com"
+	payload["password"] = "wordpass15"
+	payload["join_date"] = "2018-01-01T00:00:00Z"
+	payload["cell_phone"] = "0719166815"
+
+	p2, _ := json.Marshal(payload)
 
 	r := getRouter(false)
 	r.POST("/employees/new", CreateEmployee)
 	w := httptest.NewRecorder()
 
-	req, _ := http.NewRequest("POST", "/employees/new", strings.NewReader(string(newEmpJson)))
+	req, _ := http.NewRequest("POST", "/employees/new", strings.NewReader(string(p2)))
 	req.Header.Add("Content-Type", "application/json")
 
 	//When

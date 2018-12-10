@@ -20,15 +20,6 @@ func TestMain(m *testing.M) {
 	os.Exit(code)
 }
 
-func TestGetAllEmployees(t *testing.T) {
-	tmpEmployeeList := GetAllEmployees()
-
-	assert.Equal(t, 2, len(tmpEmployeeList))
-
-	tmpEmployeeList = []models.Employee{}
-
-}
-
 func TestCreateNewEmployee(t *testing.T) {
 	setupDB()
 	var newEmployee = utils.GetValidEmployee()
