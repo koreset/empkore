@@ -1,13 +1,24 @@
 package services
 
 import (
+	"github.com/gin-gonic/gin"
 	"github.com/koreset/empkore/models"
+	"github.com/koreset/empkore/utils"
 	"github.com/stretchr/testify/assert"
+	"golang.org/x/crypto/bcrypt"
+	"os"
 	"testing"
 	"time"
 )
 
 var tmpEmployeeList []models.Employee
+
+func TestMain(m *testing.M) {
+	gin.SetMode(gin.TestMode)
+	code := m.Run()
+
+	os.Exit(code)
+}
 
 func TestGetAllEmployees(t *testing.T) {
 	tmpEmployeeList := GetAllEmployees()
@@ -19,14 +30,14 @@ func TestGetAllEmployees(t *testing.T) {
 }
 
 func TestCreateNewEmployee(t *testing.T) {
+	setupDB()
+	var newEmployee = utils.GetValidEmployee()
+	var expectedEmployee = utils.GetValidEmployee()
 
-	var newEmployee = models.Employee{ID: 3, FirstName: "Kuzo", LastName: "Dasa", Email: "kuzo@koreset.com", JoinDate: time.Date(2018, time.April, 01, 0, 0, 0, 0, time.UTC)}
 	CreateNewEmployee(&newEmployee)
-	tmpEmployeeList = GetAllEmployees()
 
-	assert.Equal(t, 3, len(tmpEmployeeList))
-	assert.Contains(t, tmpEmployeeList, newEmployee)
-	tmpEmployeeList = []models.Employee{}
+	assert.Equal(t, expectedEmployee.FirstName, newEmployee.FirstName)
+	assert.Nil(t, bcrypt.CompareHashAndPassword([]byte(newEmployee.Password), []byte(expectedEmployee.Password)))
 
 	cleanupDb()
 
@@ -40,6 +51,22 @@ func TestGetEmployeeByID(t *testing.T) {
 	assert.Equal(t, expectedEmployee, actualEmployee)
 }
 
+func TestEncryptPassword(t *testing.T) {
+	// Given
+	password := "+w3ak15-@BlaqBee04"
+
+	//When
+	hashed := encryptPassword(password)
+
+	//Then
+	assert.Equal(t, 60, len(hashed))
+	assert.Nil(t, bcrypt.CompareHashAndPassword([]byte(hashed), []byte(password)))
+}
+
+func setupDB() {
+	GetDB().DropTableIfExists(&models.Employee{}, models.Position{})
+	GetDB().AutoMigrate(&models.Employee{}, models.Position{})
+}
 func cleanupDb() {
 	GetDB().DropTable(&models.Employee{})
 }

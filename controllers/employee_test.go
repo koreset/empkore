@@ -5,6 +5,7 @@ import (
 	"github.com/gin-gonic/gin"
 	"github.com/koreset/empkore/models"
 	"github.com/koreset/empkore/services"
+	"github.com/koreset/empkore/utils"
 	"github.com/stretchr/testify/assert"
 	"io/ioutil"
 	"net/http"
@@ -14,7 +15,6 @@ import (
 	"strconv"
 	"strings"
 	"testing"
-	"time"
 )
 
 func TestMain(m *testing.M) {
@@ -31,6 +31,7 @@ func TestMain(m *testing.M) {
 //TestCreateEmployee will test the creation of a new employee object
 func TestCreateEmployeeFormPayload(t *testing.T) {
 	//Given
+	setupDB()
 	employeePayload := getEmployeeFormPayload()
 
 	var actual models.Employee
@@ -61,14 +62,14 @@ func TestCreateEmployeeJsonPayload(t *testing.T) {
 	//Given
 	setupDB()
 	var actual models.Employee
-	newEmp := getValidEmployee()
+	newEmp := utils.GetValidEmployee()
 	newEmpJson, _ := json.Marshal(newEmp)
 
 	r := getRouter(false)
 	r.POST("/employees/new", CreateEmployee)
 	w := httptest.NewRecorder()
 
-	req, _ := http.NewRequest("POST","/employees/new", strings.NewReader(string(newEmpJson)))
+	req, _ := http.NewRequest("POST", "/employees/new", strings.NewReader(string(newEmpJson)))
 	req.Header.Add("Content-Type", "application/json")
 
 	//When
@@ -102,25 +103,12 @@ func TestCreateEmployeeThrowInvalidErrors(t *testing.T) {
 }
 
 func TestIsValidEmployee(t *testing.T) {
-	newEmp := getValidEmployee()
+	newEmp := utils.GetValidEmployee()
 	assert.True(t, isValidEmployee(newEmp))
 
 	invalidEmp := models.Employee{}
 
 	assert.False(t, isValidEmployee(invalidEmp))
-}
-
-func getValidEmployee() models.Employee {
-	newEmp := models.Employee{
-		ID:        1,
-		FirstName: "Jome",
-		LastName:  "Akpoduado",
-		Email:     "jome@koreset.com",
-		CellPhone: "0719166815",
-		JoinDate:  time.Date(2018, time.January, 01, 0, 0, 0, 0, time.UTC),
-		Password:  "wordpass15",
-	}
-	return newEmp
 }
 
 func getEmployeeFormPayload() string {
@@ -156,10 +144,11 @@ func getRouter(withTemplates bool) *gin.Engine {
 	return r
 }
 
-func cleanupDB(){
+func cleanupDB() {
 	services.GetDB().DropTableIfExists(&models.Employee{}, &models.Position{})
 }
 
-func setupDB(){
+func setupDB() {
+	services.GetDB().DropTableIfExists(&models.Position{}, &models.Employee{})
 	services.GetDB().AutoMigrate(&models.Position{}, &models.Employee{})
 }

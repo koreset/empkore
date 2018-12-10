@@ -2,6 +2,7 @@ package services
 
 import (
 	"github.com/koreset/empkore/models"
+	"golang.org/x/crypto/bcrypt"
 	"time"
 )
 
@@ -12,6 +13,7 @@ var employeeList = []models.Employee{
 
 func CreateNewEmployee(employee *models.Employee) {
 	GetDB().Create(&employee)
+	employee.Password = encryptPassword(employee.Password)
 	employeeList = append(employeeList, *employee)
 }
 
@@ -26,4 +28,9 @@ func GetEmployeeByID(id uint) (models.Employee, error) {
 		}
 	}
 	return models.Employee{}, nil
+}
+
+func encryptPassword(password string) string {
+	hashed, _ := bcrypt.GenerateFromPassword([]byte(password), bcrypt.DefaultCost)
+	return string(hashed)
 }
