@@ -89,6 +89,7 @@ func TestCreateEmployeeJsonPayload(t *testing.T) {
 
 func TestCreateEmployeeThrowInvalidErrors(t *testing.T) {
 	//Given
+	setupDB()
 	incompletePayload := getIncompleteEmployeeFormPayload()
 	r := getRouter(false)
 	r.POST("/employees/new", CreateEmployee)
@@ -100,6 +101,7 @@ func TestCreateEmployeeThrowInvalidErrors(t *testing.T) {
 	r.ServeHTTP(w, req)
 	//Then
 	assert.Equal(t, http.StatusBadRequest, w.Code)
+	cleanupDB()
 }
 
 func TestIsValidEmployee(t *testing.T) {

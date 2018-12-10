@@ -12,9 +12,8 @@ var employeeList = []models.Employee{
 }
 
 func CreateNewEmployee(employee *models.Employee) {
-	GetDB().Create(&employee)
 	employee.Password = encryptPassword(employee.Password)
-	employeeList = append(employeeList, *employee)
+	GetDB().Create(&employee)
 }
 
 func GetAllEmployees() []models.Employee {
@@ -28,6 +27,16 @@ func GetEmployeeByID(id uint) (models.Employee, error) {
 		}
 	}
 	return models.Employee{}, nil
+}
+
+func GetEmployeeByEmail(email string) (models.Employee, error) {
+	var emp models.Employee
+
+	err := GetDB().Where("email = ?", email).First(&emp).Error
+	if err != nil{
+		return emp, err
+	}
+	return emp, nil
 }
 
 func encryptPassword(password string) string {

@@ -51,6 +51,21 @@ func TestGetEmployeeByID(t *testing.T) {
 	assert.Equal(t, expectedEmployee, actualEmployee)
 }
 
+func TestGetEmployeeByEmail(t *testing.T) {
+	setupDB()
+	emp := utils.GetValidEmployee()
+	CreateNewEmployee(&emp)
+
+	actual, _ := GetEmployeeByEmail(emp.Email)
+
+	//Clean out the password fields...
+	emp.Password = ""
+	actual.Password = ""
+
+	assert.Equal(t, emp, actual)
+
+}
+
 func TestEncryptPassword(t *testing.T) {
 	// Given
 	password := "+w3ak15-@BlaqBee04"
