@@ -21,17 +21,17 @@ func CreateEmployee(c *gin.Context) {
 		c.Header("Content-Location", "/employees/"+strconv.Itoa(int(emp.ID)))
 		c.JSON(http.StatusCreated, emp)
 
-	}else{
-		c.JSON(http.StatusBadRequest, gin.H{"error":"There were one or more validation errors encountered"})
+	} else {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "There were one or more validation errors encountered"})
 	}
 }
 
 func isValidEmployee(emp models.Employee) bool {
-	if len(emp.FirstName) < 1{
-		return  false
+	if len(emp.FirstName) < 1 {
+		return false
 	}
 
-	if len(emp.LastName) < 1{
+	if len(emp.LastName) < 1 {
 		return false
 	}
 
@@ -45,3 +45,4 @@ func isValidEmployee(emp models.Employee) bool {
 
 	return true
 }
+
