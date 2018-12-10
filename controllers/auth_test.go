@@ -9,6 +9,7 @@ import (
 	"io/ioutil"
 	"net/http"
 	"net/http/httptest"
+	"net/url"
 	"strings"
 	"testing"
 )
@@ -32,7 +33,27 @@ func TestAuthenticateEmployee(t *testing.T) {
 
 }
 
-func TestLogin(t *testing.T) {
+func TestLoginGetPage(t *testing.T) {
+	w := httptest.NewRecorder()
+	r := gin.Default()
+	templates, _ := utils.SetupTemplates("../views")
+	r.SetHTMLTemplate(templates)
+	r.GET("/login", Login)
+	req, _ := http.NewRequest("GET", "/login", nil)
+
+	r.ServeHTTP(w, req)
+
+	content, _ := ioutil.ReadAll(w.Body)
+
+	assert.Equal(t, http.StatusOK, w.Code)
+
+	assert.Contains(t, string(content), "<title>Login</title>")
+	assert.Contains(t, string(content), `<label for="email">Email address</label>`)
+	assert.Contains(t, string(content), `<label for="password">Password</label>`)
+
+}
+
+func TestLoginViaAPI(t *testing.T) {
 	//Given
 	setupDB()
 	var userLogin = UserLogin{
@@ -62,4 +83,33 @@ func TestLogin(t *testing.T) {
 	//Finally
 	cleanupDB()
 
+}
+
+
+func TestLoginViaForm(t *testing.T){
+	setupDB()
+	testEmp := utils.GetValidEmployee()
+	services.CreateNewEmployee(&testEmp)
+
+	r := gin.Default()
+	r.POST("/login", Login)
+	templates, _ := utils.SetupTemplates("../views")
+	r.SetHTMLTemplate(templates)
+
+	params := url.Values{}
+	params.Add("email", "jome@koreset.com")
+	params.Add("password","wordpass15")
+
+	payload := params.Encode()
+
+	req, _ := http.NewRequest("POST", "/login", strings.NewReader(payload))
+	req.Header.Add("Content-Type", "application/x-www-form-urlencoded")
+	w := httptest.NewRecorder()
+	content, _ := ioutil.ReadAll(w.Body)
+
+	r.ServeHTTP(w, req)
+
+	assert.Equal(t, http.StatusOK, w.Code)
+	assert.Contains(t, string(content), "Dashboard")
+	cleanupDB()
 }

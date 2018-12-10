@@ -35,7 +35,7 @@ func TestCreateEmployeeFormPayload(t *testing.T) {
 	employeePayload := getEmployeeFormPayload()
 
 	var actual models.Employee
-	r := getRouter(false)
+	r := getRouter(true)
 	r.POST("/employees/new", CreateEmployee)
 	w := httptest.NewRecorder()
 	req := httptest.NewRequest("POST", "/employees/new", strings.NewReader(employeePayload))

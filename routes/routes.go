@@ -8,6 +8,7 @@ import (
 func InitializeRoutes(r *gin.Engine){
 	r.GET("/", controllers.Home)
 	r.POST("/login", controllers.Login)
+	r.GET("/login", controllers.Login)
 	r.POST("/employees/new", controllers.CreateEmployee)
 
 	r.Static("/public", "./assets")
